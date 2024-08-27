@@ -65,6 +65,11 @@
 
 	<repositories>
 		<repository>
+			<id>github</id>
+          	<name>GitHub Packages</name>
+          	<url>https://maven.pkg.github.com/JanssenProject/jans</url>
+		</repository>
+		<repository>
 			<id>central</id>
 			<name>Maven Repository Switchboard</name>
 			<layout>default</layout>
