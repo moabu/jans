@@ -71,11 +71,11 @@ public class SGService extends FidoService {
             logger.warn("Config. properties for flow '{}' could not be read", acr);
         } else {
             try {
-                conf = SGConfig.get(props.getJSONObject("qr_settings"));
-                String appId = props.getString("appId");
+                conf = SGConfig.get(props.getJSONObject("qr_options"));
+                String appId = props.optString("appId", null);
                 
                 if (appId == null) {
-                    appId = new URL(persistenceService.getIssuerUrl()).getHost() + "/jans-casa";
+                    appId = String.format("https://%s/%s", new URL(persistenceService.getIssuerUrl()).getHost(), "jans-casa");
                 }
                 
                 conf.setAppId(appId);

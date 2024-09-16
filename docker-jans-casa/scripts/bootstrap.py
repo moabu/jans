@@ -1,8 +1,6 @@
 import json
 import logging.config
-import math
 import os
-import time
 from uuid import uuid4
 from string import Template
 from functools import cached_property
@@ -24,6 +22,7 @@ from jans.pycloudlib.persistence.ldap import sync_ldap_password
 from jans.pycloudlib.persistence.ldap import sync_ldap_truststore
 from jans.pycloudlib.persistence.spanner import render_spanner_properties
 from jans.pycloudlib.persistence.spanner import SpannerClient
+from jans.pycloudlib.persistence.spanner import sync_google_credentials
 from jans.pycloudlib.persistence.sql import doc_id_from_dn
 from jans.pycloudlib.persistence.sql import render_sql_properties
 from jans.pycloudlib.persistence.sql import SqlClient
@@ -39,6 +38,10 @@ from jans.pycloudlib.utils import as_boolean
 from jans.pycloudlib.utils import get_server_certificate
 
 from settings import LOGGING_CONFIG
+from utils import generalized_time_utc
+from utils import get_ads_project_base64
+from utils import CASA_AGAMA_DEPLOYMENT_ID
+from utils import CASA_AGAMA_ARCHIVE
 
 logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger("jans-casa")
@@ -136,7 +139,9 @@ def main():
             "/app/templates/jans-ldap.properties",
             "/etc/jans/conf/jans-ldap.properties",
         )
-        sync_ldap_truststore(manager)
+
+        if as_boolean(os.environ.get("CN_LDAP_USE_SSL", "true")):
+            sync_ldap_truststore(manager)
         sync_ldap_password(manager)
 
     if "couchbase" in persistence_groups:
@@ -146,8 +151,10 @@ def main():
             "/app/templates/jans-couchbase.properties",
             "/etc/jans/conf/jans-couchbase.properties",
         )
-        sync_couchbase_cert(manager)
-        sync_couchbase_truststore(manager)
+
+        if as_boolean(os.environ.get("CN_COUCHBASE_TRUSTSTORE_ENABLE", "true")):
+            sync_couchbase_cert(manager)
+            sync_couchbase_truststore(manager)
 
     if "sql" in persistence_groups:
         sync_sql_password(manager)
@@ -164,6 +171,7 @@ def main():
             "/app/templates/jans-spanner.properties",
             "/etc/jans/conf/jans-spanner.properties",
         )
+        sync_google_credentials(manager)
 
     wait_for_persistence(manager)
 
@@ -228,7 +236,7 @@ class PersistenceSetup:
             "casa_redirect_uri": f"https://{hostname}/jans-casa",
             "casa_redirect_logout_uri": f"https://{hostname}/jans-casa/bye.zul",
             "casa_frontchannel_logout_uri": f"https://{hostname}/jans-casa/autologout",
-            "casa_agama_deployment_id": "202447d5-d44c-3125-b1f7-207cb33b6bf7",
+            "casa_agama_deployment_id": CASA_AGAMA_DEPLOYMENT_ID,
         }
 
         # Casa client
@@ -252,15 +260,8 @@ class PersistenceSetup:
         with open("/app/templates/jans-casa/casa-config.json") as f:
             ctx["casa_config_base64"] = generate_base64_contents(f.read() % ctx)
 
-        # calculate start date
-        ts = time.time()
-        microseconds, _ = math.modf(ts)
-        gm_ts = time.gmtime(ts)
-        ctx["jans_start_date"] = time.strftime("%Y%m%d%H%M%S", gm_ts) + f"{microseconds:.3f}Z"[1:]
-
-        # casa agama project (requires agama script to be enabled)
-        with open("/usr/share/java/casa-agama-project.zip", "rb") as f:
-            ctx["ads_prj_assets_base64"] = generate_base64_contents(f.read())
+        ctx["jans_start_date"] = generalized_time_utc()
+        ctx["ads_prj_assets_base64"] = get_ads_project_base64(CASA_AGAMA_ARCHIVE)
 
         # finalized contexts
         return ctx

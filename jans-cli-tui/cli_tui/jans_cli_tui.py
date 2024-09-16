@@ -676,6 +676,9 @@ class JansCliApp(Application):
         if value is None:
             value = ''
 
+        if jans_list_type and isinstance(value, list):
+            value = '\n'.join(value)
+
         ta = TextArea(
                 text=str(value),
                 multiline=height > 1,
@@ -730,11 +733,12 @@ class JansCliApp(Application):
         if values and not (isinstance(values[0], tuple) or isinstance(values[0], list)):
             values = [(o,o) for o in values]
         cbl = CheckboxList(values=values)
+        cbl.default_style=widget_style
         cbl.current_values = current_values
         cbl.window.jans_name = name
         cbl.window.jans_help = jans_help
 
-        v = VSplit([Window(FormattedTextControl(title), width=len(title)+1, style=style,), cbl], style=widget_style)
+        v = VSplit([Window(FormattedTextControl(title), width=len(title)+1, style=style), cbl], style=widget_style)
         v.me = cbl
 
         return v
@@ -842,7 +846,7 @@ class JansCliApp(Application):
                 handler: Callable= None, 
                 ) -> Button:
 
-        b = Button(text=text, width=len(text)+2)
+        b = Button(text=text, width=len(text)+4)
         b.window.jans_name = name
         b.window.jans_help = jans_help
         if handler:
@@ -1022,6 +1026,7 @@ class JansCliApp(Application):
         self.layout.focus(dialog)
         self.invalidate()
 
+        return dialog
 
     def get_confirm_dialog(
             self,

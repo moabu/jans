@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 @Extension
 public class SuperGluuExtension implements AuthnMethod {
 
-    public static final String ACR = "io.jans.casa.authn.sg";
+    public static final String ACR = "io.jans.casa.authn.super_gluu";
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 

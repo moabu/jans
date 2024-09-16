@@ -22,9 +22,9 @@ import Alert from '@mui/material/Alert';
 export default function RegisterClient({ isOpen, handleDialog }) {
   const [open, setOpen] = React.useState(isOpen);
   const [selectedScopes, setSelectedScopes] = React.useState([])
+  const [scopeOptions, setScopeOptions] = React.useState([{ name: "openid" }]);
   const [expireAt, setExpireAt] = React.useState(null);
   const [issuer, setIssuer] = React.useState(null);
-  const [scopeOptions, setScopeOptions] = React.useState([{ name: "openid" }]);
   const [issuerError, setIssuerError] = React.useState("")
   const [errorMessage, setErrorMessage] = React.useState("")
   const [loading, setLoading] = React.useState(false);
@@ -140,7 +140,7 @@ export default function RegisterClient({ isOpen, handleDialog }) {
 
       if (openidConfig != undefined) {
         chrome.storage.local.set({ opConfiguration: openidConfig.data }).then(() => {
-          console.log("openapiConfig is set to " + openidConfig);
+          console.log("OP Configuration: " + JSON.stringify(openidConfig));
         });
 
         const registrationUrl = openidConfig.data.registration_endpoint;
@@ -155,7 +155,8 @@ export default function RegisterClient({ isOpen, handleDialog }) {
           client_name: 'jans-tarp-' + uuidv4(),
           token_endpoint_auth_method: 'client_secret_basic',
           access_token_as_jwt: true,
-          userinfo_signed_response_alg: "RS256"
+          userinfo_signed_response_alg: "RS256",
+          jansInclClaimsInIdTkn: "true"
         };
 
         if (!!expireAt) {
