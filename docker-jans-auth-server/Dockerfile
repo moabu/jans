@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjdk-alpine:17.0.12@sha256:877a6ffc273212bd3f695db2a7973a05aa1bfb88ad550ba9ffe7deb7d1e50eee
+FROM bellsoft/liberica-openjdk-alpine:17.0.12@sha256:83719ee0075de03ecc7a99db489fd72a022e49f09c0e6e6350bcc05310c3caf6
 
 # ===============
 # Alpine packages
@@ -50,8 +50,8 @@ RUN /opt/jython/bin/pip uninstall -y pip setuptools
 # Auth server
 # ===========
 
-ENV CN_VERSION=1.1.5-SNAPSHOT
-ENV CN_BUILD_DATE='2024-09-14 11:49'
+ENV CN_VERSION=1.1.6-SNAPSHOT
+ENV CN_BUILD_DATE='2024-10-02 13:40'
 
 ENV CN_SOURCE_URL=https://jenkins.jans.io/maven/io/jans/jans-auth-server/${CN_VERSION}/jans-auth-server-${CN_VERSION}.war
 
@@ -103,7 +103,7 @@ RUN mkdir -p ${JETTY_BASE}/jans-auth/agama/fl \
     /app/static/rdbm \
     /app/schema
 
-ENV JANS_SOURCE_VERSION=0f3838b05931401dbfcccd493ad8457435a56ed6
+ENV JANS_SOURCE_VERSION=5f3b30e4b565601ccb31cd985920c09071cd1b54
 ARG JANS_SETUP_DIR=jans-linux-setup/jans_setup
 
 # note that as we're pulling from a monorepo (with multiple project in it)
@@ -205,10 +205,8 @@ ENV CN_SECRET_ADAPTER=vault \
 # Persistence ENV
 # ===============
 
-ENV CN_PERSISTENCE_TYPE=ldap \
+ENV CN_PERSISTENCE_TYPE=sql \
     CN_HYBRID_MAPPING="{}" \
-    CN_LDAP_URL=localhost:1636 \
-    CN_LDAP_USE_SSL=true \
     CN_COUCHBASE_URL=localhost \
     CN_COUCHBASE_USER=admin \
     CN_COUCHBASE_CERT_FILE=/etc/certs/couchbase.crt \
@@ -267,7 +265,7 @@ EXPOSE $CN_AUTH_JETTY_PORT
 LABEL org.opencontainers.image.url="ghcr.io/janssenproject/jans/auth-server" \
     org.opencontainers.image.authors="Janssen Project <support@jans.io>" \
     org.opencontainers.image.vendor="Janssen Project" \
-    org.opencontainers.image.version="1.1.5" \
+    org.opencontainers.image.version="1.1.6" \
     org.opencontainers.image.title="Janssen Authorization Server" \
     org.opencontainers.image.description="OAuth 2.0 server and client; OpenID Connect Provider (OP) & UMA Authorization Server (AS)"
 

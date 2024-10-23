@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjre-alpine:17.0.12@sha256:a39e3fb3c96ae89e936a2e50c0a597a91d2357a1ec19096c05e851f54f3a9715
+FROM bellsoft/liberica-openjre-alpine:17.0.12@sha256:29cb2ee552c7c7a924b6a1b59802508dc5123e7edad1d65d575bbf07cd05fa6d
 
 # ===============
 # Alpine packages
@@ -29,8 +29,8 @@ RUN wget -q https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${JETTY_
 # Casa
 # ====
 
-ENV CN_VERSION=1.1.5-SNAPSHOT
-ENV CN_BUILD_DATE='2024-09-11 08:59'
+ENV CN_VERSION=1.1.6-SNAPSHOT
+ENV CN_BUILD_DATE='2024-10-02 09:31'
 
 ENV CN_SOURCE_URL=https://jenkins.jans.io/maven/io/jans/casa/${CN_VERSION}/casa-${CN_VERSION}.war
 
@@ -47,7 +47,7 @@ RUN mkdir -p ${JETTY_BASE}/jans-casa/webapps \
 
 # casa plugins
 RUN mkdir -p ${JETTY_BASE}/jans-casa/plugins \
-    && for casa_plugin in acct-linking authorized-clients bioid-plugin custom-branding email_2fa_core strong-authn-settings; \
+    && for casa_plugin in acct-linking authorized-clients bioid-plugin custom-branding strong-authn-settings; \
     do \
         wget -nv "https://jenkins.jans.io/maven/io/jans/casa/plugins/${casa_plugin}/${CN_VERSION}/${casa_plugin}-${CN_VERSION}-jar-with-dependencies.jar" -O "${JETTY_BASE}/jans-casa/plugins/${casa_plugin}-${CN_VERSION}.jar"; \
     done
@@ -60,7 +60,7 @@ RUN mkdir -p /usr/share/java \
 # Assets sync
 # ===========
 
-ENV JANS_SOURCE_VERSION=0f3838b05931401dbfcccd493ad8457435a56ed6
+ENV JANS_SOURCE_VERSION=5f3b30e4b565601ccb31cd985920c09071cd1b54
 ARG JANS_SETUP_DIR=jans-linux-setup/jans_setup
 
 # note that as we're pulling from a monorepo (with multiple project in it)
@@ -163,10 +163,8 @@ ENV CN_SECRET_ADAPTER=vault \
 # Persistence ENV
 # ===============
 
-ENV CN_PERSISTENCE_TYPE=ldap \
+ENV CN_PERSISTENCE_TYPE=sql \
     CN_HYBRID_MAPPING="{}" \
-    CN_LDAP_URL=localhost:1636 \
-    CN_LDAP_USE_SSL=true \
     CN_COUCHBASE_URL=localhost \
     CN_COUCHBASE_USER=admin \
     CN_COUCHBASE_CERT_FILE=/etc/certs/couchbase.crt \
@@ -219,7 +217,7 @@ EXPOSE $CN_CASA_JETTY_PORT
 LABEL org.opencontainers.image.url="ghcr.io/janssenproject/jans/casa" \
     org.opencontainers.image.authors="Gluu Inc. <support@gluu.org>" \
     org.opencontainers.image.vendor="Gluu Federation" \
-    org.opencontainers.image.version="1.1.5" \
+    org.opencontainers.image.version="1.1.6" \
     org.opencontainers.image.title="Janssen Casa" \
     org.opencontainers.image.description="Self-service portal for people to manage their account security preferences in the Janssen, like 2FA"
 
